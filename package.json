@@ -1,0 +1,25 @@
+{
+  "name": "atomics",
+  "version": "1.0.0",
+  "description": "Truly funcitonal css",
+  "main": "index.js",
+  "author": "Steven Saunders <steve@sentosatech.com>",
+  "license": "MIT",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "devDependencies": {
+    "lerna": "^3.10.8"
+  },
+  "scripts": {
+    "start": "cd packages/client-test && yarn start",
+    "clean": "lerna run clean",
+    "build": "lerna run build",
+    "test":  "lerna run test",
+    "clean:modules": "lerna clean -y; rm -rf ./node_modules",
+    "clean:all": "yarn clean; yarn clean:modules",
+    "bootstrap": "lerna bootstrap",
+    "refresh": "yarn clean:all && lerna bootstrap && yarn build"
+  }
+}

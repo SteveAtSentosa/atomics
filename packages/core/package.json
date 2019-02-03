@@ -1,0 +1,26 @@
+{
+  "name": "@atomics/core",
+  "version": "0.0.0",
+  "main": "src/index.js",
+  "author": "Steven Saunders <steve@sentosatech.com>",
+  "description": "Core atomics library",
+  "license": "MIT",
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "cross-env": "^5.2.0",
+    "onchange": "^5.2.0",
+    "ramda": "^0.26.1",
+    "rimraf": "^2.6.3"
+    },
+  "scripts": {
+    "clean": "rimraf es dist lib",
+    "build:cjs": "cross-env BABEL_ENV=cjs babel src --out-dir lib",
+    "build:es": "cross-env BABEL_ENV=es babel src --out-dir es",
+    "build:umd": "webpack --mode=development --output-filename=atomics.js",
+    "build:umd:min": "webpack --mode=production --output-filename=atomics.min.js",
+    "build": "yarn build:cjs && yarn build:es && yarn build:umd && yarn build:umd:min",
+    "prepub": "yarn clean && yarn test && yarn build",
+    "test": "mocha --require @babel/register",
+    "watch:test": "onchange 'src/**/*.js' 'test/**/*.js' -- yarn test"
+  }
+}

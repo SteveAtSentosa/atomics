@@ -1,0 +1,36 @@
+{
+  "name": "@atomics/client-test",
+  "version": "0.0.0",
+  "description": "Visual testing for atomics",
+  "main": "index.js",
+  "author": "Steven Saunders",
+  "license": "MIT",
+  "private": false,
+  "devDependencies": {
+    "@babel/preset-react": "^7.0.0",
+    "babel-plugin-emotion": "^10.0.6",
+    "eslint-plugin-react": "^7.12.4",
+    "express": "^4.16.4",
+    "html-webpack-plugin": "^3.2.0",
+    "react-hot-loader": "^4.6.5",
+    "react-loader": "^2.4.5",
+    "rimraf": "^2.6.3",
+    "webpack": "^4.29.0",
+    "webpack-dev-server": "^3.1.14",
+    "webpack-merge": "^4.2.1"
+  },
+  "dependencies": {
+    "@emotion/babel-preset-css-prop": "^10.0.6",
+    "@emotion/core": "^10.0.6",
+    "prop-types": "^15.6.2",
+    "react": "^16.7.0",
+    "react-dom": "^16.7.0"
+  },
+  "scripts": {
+    "clean": "rimraf dist",
+    "start:dev": "webpack-dev-server --open --port 3000 --hot --config ./webpack.dev.js",
+    "start": "yarn start:dev",
+    "start:prod": "node ./prodServer.js",
+    "build": "webpack --config ./webpack.prod.js"
+  }
+}
