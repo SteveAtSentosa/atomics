@@ -1,5 +1,5 @@
 import { flatten, isStr, isUndef, isObj } from '../utils/typeUtils'
-import { atomicInfoFromCssStr, atomExists, getAtomicCssStr, addAtomByCssStr } from '../utils/atomicUtils'
+import { atomicInfoFromCssStr, atomExists, getAtomicCss, addAtomByCssStr } from '../utils/atomicUtils'
 import { fillCssTemplate } from '../utils/cssUtils'
 
 export const pseudoMap = {
@@ -30,10 +30,11 @@ const validSelectorInput = (atoms, selector, cssStr) =>
 export const makePseudoFn = (atoms, selector) => (...cssStrs) =>
   flatten(cssStrs).map(cssStr => {
     if (!validSelectorInput(atoms, selector, cssStr)) return ''
+
     const { atomicType, cssSpec } = atomicInfoFromCssStr(atoms, cssStr)
     const pseudoCssSpec = `${selector}:${cssSpec}`
     return atomExists(atoms, atomicType, pseudoCssSpec) ?
-      getAtomicCssStr(atoms, atomicType, pseudoCssSpec) :
+      getAtomicCss(atoms, atomicType, pseudoCssSpec) :
       addAtomByCssStr(atoms, atomicType, pseudoCssSpec, pseudoCssStr(selector, cssStr))
   })
 

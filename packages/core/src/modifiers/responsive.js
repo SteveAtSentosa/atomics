@@ -1,5 +1,5 @@
 import { flatten, capitalize, isStr, isUndef, isObj } from '../utils/typeUtils'
-import { atomicInfoFromCssStr, atomExists, getAtomicCssStr, addAtomByCssStr } from '../utils/atomicUtils'
+import { atomicInfoFromCssStr, atomExists, getAtomicCss, addAtomByCssStr } from '../utils/atomicUtils'
 import { fillCssTemplate } from '../utils/cssUtils'
 
 export const rxMap = {
@@ -38,7 +38,7 @@ export const makeResponsiveFn = (atoms, breakPt) => (...cssStrs) =>
     const { atomicType, cssSpec } = atomicInfoFromCssStr(atoms, cssStr)
     const responsiveCssSpec = `${breakPt}:${cssSpec}`
     return atomExists(atoms, atomicType, responsiveCssSpec) ?
-      getAtomicCssStr(atoms, atomicType, responsiveCssSpec) :
+      getAtomicCss(atoms, atomicType, responsiveCssSpec) :
       addAtomByCssStr(atoms, atomicType, responsiveCssSpec, responsiveCssStr(breakPt, cssStr))
   })
 

@@ -27,4 +27,3 @@ export const spacingAtomicMap = {
   marginHoriz:   { atomicType: 'mx', cssTemplate: 'margin: 0 $1',         cssMapFn: mapSpace },
 }
 
-

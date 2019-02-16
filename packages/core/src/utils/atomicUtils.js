@@ -1,18 +1,26 @@
 import { isObj, isStr, isNumOrNonEmptyStr, isUndef, isNonEmptyStr, getOr } from './typeUtils'
 import { cssKeysToSpec, fillCssTemplate } from './cssUtils'
-//import { getOr } from './typeUtils'
 
-// atoms = {
+// const atoms = {
 //   pt : { <-- atomicType
-//     1:            'padding-top: 0.25rem', <-- an atom,  applied via atomic fxn pt(1)
-//     2:            'padding-top: 0.5rem'   <-- another atom, applied via atomic fxn pt(2)
-//     ^              ^
-//     cssSpec        cssStr (css string or classname, depening upon definition of toClass())
-//
-//   c : { <-- a second atomicType
-//     red:           'color:     #c62828',  <-- an atom, applied via atomic fxn c('red')
-//   }                ^cssProp    ^cssVal
+//     1: { <-- cssSpec
+//       cssStr: 'padding-top: 0.25rem',
+//                ^cssProp    ^cssVal
+//       mappedCss: {}
+//     },
+//     2: {
+//       cssStr: 'padding-top: 0.5rem',
+//       mappedCss: {}
+//     },
+//     c : {
+//       red: {
+//         cssStr: 'color: #c62828',
+//         mappedCss: {}
+//       }
+//     }
+//   }
 // }
+
 
 // is atomic input valid?
 // {atoms} -> 'atomicType' -> 'cssSpec' -> bool
@@ -31,11 +39,20 @@ export const atomExists = (atoms, atomicType, cssSpec) =>
   atomicTypeExists(atoms, atomicType) &&
   !isUndef(atoms[atomicType][cssSpec])
 
-// get an atomic cssStr
+// get an atom's cssStr
 // Returns '' if atom does not exist, or on invalid input
-// {atoms} -> 'atomicType' -> 'cssSpec' -> 'cssStr'
+// {atoms} -> 'atomicType' -> 'cssSpec' -> 'cssStr' | any:mappedCss
 export const getAtomicCssStr = (atoms, atomicType, cssSpec) =>
-  atomExists(atoms, atomicType, cssSpec) ? atoms[atomicType][cssSpec] : ''
+  atomExists(atoms, atomicType, cssSpec) ? atoms[atomicType][cssSpec]['cssStr'] : ''
+
+export const getAtomicMappedCss = (atoms, atomicType, cssSpec) =>
+  atomExists(atoms, atomicType, cssSpec) ? atoms[atomicType][cssSpec]['mappedCss'] : ''
+
+// if css mapping is active, atoms mappedCss, otherwise returns cssStr
+export const getAtomicCss = (atoms, atomicType, cssSpec) =>
+  atoms._mapCssFn ?
+    getAtomicMappedCss(atoms, atomicType, cssSpec) :
+    getAtomicCssStr(atoms, atomicType, cssSpec)
 
 // Add an atom if you arlready know the cssString
 // returns cssStr
@@ -44,13 +61,14 @@ export const addAtomByCssStr = (atoms, atomicType, cssSpec, cssStr) => {
 
   // add the atom
   if (!atomicTypeExists(atoms, atomicType)) atoms[atomicType] = {}
-  atoms[atomicType][cssSpec] = cssStr
+  const mappedCss = atoms._mapCssFn ? atoms._mapCssFn(cssStr) : ''
+  atoms[atomicType][cssSpec] = { cssStr, mappedCss }
 
   // add to the reverse atom
   if (isUndef(atoms['_reverse'])) atoms['_reverse'] = {}
   atoms['_reverse'][cssStr] = { atomicType, cssSpec }
 
-  return cssStr
+  return atoms._mapCssFn ? mappedCss : cssStr
 }
 
 // Add an atom to the atoms object
@@ -74,7 +92,7 @@ export const makeAtomicFn = (atoms, atomicType, cssMapFn, cssTemplate) =>
   (...cssKeys) => {
     const cssSpec = cssKeysToSpec(cssKeys)
     return atomExists(atoms, atomicType, cssSpec) ?
-      getAtomicCssStr(atoms, atomicType, cssSpec) :
+      getAtomicCss(atoms, atomicType, cssSpec) :
       addAtomByCssKeys(atoms, atomicType, cssMapFn, cssTemplate, cssKeys)
   }
 // Given an atomic map, return object containing corresponding atomic functions

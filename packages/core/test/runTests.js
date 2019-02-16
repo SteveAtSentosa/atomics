@@ -12,6 +12,6 @@ describe('atomics tests', () => {
   runCssTemplateTests()
   runCssSpecTests()
   runAtomTests()
-  runAtomFunctionTests()
-  runAtomicModifierTests()
+  // runAtomFunctionTests()
+  // runAtomicModifierTests()
 })

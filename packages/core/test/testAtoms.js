@@ -21,8 +21,8 @@ export default function runAtomTests() {
   describe('test atoms', () => {
     it('should add atoms correctly', () => {
 
-      let atoms = { _reverse: {} }
-      let atomsRef = {}
+      let atoms = { _reverse: {}, _mapCssFn: null }
+      let atomsRef = { _reverse: {}, _mapCssFn: null }
 
       tests.forEach(t => {
 
@@ -32,16 +32,15 @@ export default function runAtomTests() {
         const cssKeys = t[3]
         const expectedCssSpec = t[4]
         const expectedCssStr = t[5]
-        const expectedAtom = { [expectedCssSpec]: expectedCssStr }
+        const expectedAtom = { [expectedCssSpec]: { cssStr: expectedCssStr, mappedCss: '' } }
 
         const cssStr = addAtomByCssKeys(atoms, atomicType, cssMapFn, cssTemplate, cssKeys)
-        expect(cssStr).to.deep.equal(expectedCssStr)
+        expect(cssStr).to.equal(expectedCssStr)
         atomsRef = mergeDeepRight(atomsRef, { [atomicType] : expectedAtom })
         atomsRef._reverse = mergeDeepRight(atomsRef._reverse, { [cssStr]: { atomicType, cssSpec: expectedCssSpec } })
         expect(atoms).to.deep.equal(atomsRef)
         expect(getAtomicCssStr(atoms, atomicType, expectedCssSpec)).to.equal(expectedCssStr)
         expect(atomicInfoFromCssStr(atoms, cssStr)).to.deep.equal({ atomicType, cssSpec: expectedCssSpec })
-
       })
     })
   })
