@@ -3,7 +3,7 @@ import { mergeDeepRight } from 'ramda'
 import { mapSpace } from '../src/maps/space'
 import { mapDisplay } from '../src/maps/layout'
 import { mapColor } from '../src/maps/color'
-import { addAtomByCssKeys, getAtomicCssStr, atomicInfoFromCssStr } from '../src/utils/atomicUtils'
+import { addAtomByCssKeys, getAtomicVec } from '../src/utils/atomicUtils'
 
 const tests = [
   //                                                              expected      expected
@@ -33,14 +33,14 @@ export default function runAtomTests() {
         const expectedCssSpec = t[4]
         const expectedCssStr = t[5]
         const expectedAtom = { [expectedCssSpec]: { cssStr: expectedCssStr, mappedCss: '' } }
+        const expectedAtomicVec = { atomicType, cssSpec: expectedCssSpec, css: expectedCssStr }
 
-        const cssStr = addAtomByCssKeys(atoms, atomicType, cssMapFn, cssTemplate, cssKeys)
-        expect(cssStr).to.equal(expectedCssStr)
+        const atomicVec = addAtomByCssKeys(atoms, atomicType, cssMapFn, cssTemplate, cssKeys)
+        expect(atomicVec).to.deep.equal(expectedAtomicVec)
         atomsRef = mergeDeepRight(atomsRef, { [atomicType] : expectedAtom })
-        atomsRef._reverse = mergeDeepRight(atomsRef._reverse, { [cssStr]: { atomicType, cssSpec: expectedCssSpec } })
         expect(atoms).to.deep.equal(atomsRef)
-        expect(getAtomicCssStr(atoms, atomicType, expectedCssSpec)).to.equal(expectedCssStr)
-        expect(atomicInfoFromCssStr(atoms, cssStr)).to.deep.equal({ atomicType, cssSpec: expectedCssSpec })
+        expect(getAtomicVec(atoms, atomicType, expectedCssSpec)).to.deep.equal(expectedAtomicVec)
+
       })
     })
   })

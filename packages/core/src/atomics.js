@@ -9,7 +9,7 @@ import { sizeAtomicMap } from './maps/size'
 import { mapResponsiveFns, rxMap } from './modifiers/responsive'
 import { mapPseudoFns, pseudoMap } from './modifiers/pseudo'
 
-import { mapAtomicFns } from './utils/atomicUtils'
+import { mapAtomicFns, at } from './utils/atomicUtils'
 
 
 
@@ -54,7 +54,8 @@ export default {
   ...atomicFns,
   ...atomicModifiers,
   ...atomicUtils,
-  molecules
+  at,
+  molecules,
 }
 
 

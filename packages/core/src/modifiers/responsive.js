@@ -1,5 +1,5 @@
 import { flatten, capitalize, isStr, isUndef, isObj } from '../utils/typeUtils'
-import { atomicInfoFromCssStr, atomExists, getAtomicCss, addAtomByCssStr } from '../utils/atomicUtils'
+import { atomExists, getAtomicCssStr, addAtomByCssStr, getAtomicVec } from '../utils/atomicUtils'
 import { fillCssTemplate } from '../utils/cssUtils'
 
 export const rxMap = {
@@ -21,24 +21,26 @@ export const responsiveCssStr = (breakPt, cssStr) =>
   !isStr(breakPt) || !isStr(cssStr) || isUndef(rxMap.breakPts[breakPt]) ? '' :
   fillCssTemplate([`${rxMap.breakPts[breakPt]}${rxMap.unit}`, cssStr], rxMap.template)
 
-const validBreakPtInput = (atoms, breakPt, cssStr) =>
-  isObj(atoms) && isStr(breakPt) && isStr(cssStr) &&
-  !isUndef(rxMap.breakPts[breakPt]) && !isUndef(atoms._reverse[cssStr])
+const validBreakPtInput = (atoms, breakPt, atomicVec) =>
+  isObj(atoms) && isStr(breakPt) && isObj(atomicVec) &&
+  !isUndef(rxMap.breakPts[breakPt])
 
 
 // Create a function that will apply styles at one of the breakpoints in rxMap.breakPts
-// The function returned recieves a list of the cssStrs (potentially nested) to which
+// The function returned recieves a list of the atomicVectors (potentially nested) to which
 // the specified breakpoint are applied, and which returns a flattened list of corresponding
-// breakPt aware cssStrs.  The returned function assumes that the corresponding
+// breakPt aware atomicVectors.  The returned function assumes that the corresponding
 // non-breakoint atomic entries have already been added.
-// {atoms} -> 'breakPt' -> ([ cssStr &| [cssStrs]]) -> [ 'breakPtAwareCssStrs']
-export const makeResponsiveFn = (atoms, breakPt) => (...cssStrs) =>
-  flatten(cssStrs).map(cssStr => {
-    if (!validBreakPtInput(atoms, breakPt, cssStr)) return ''
-    const { atomicType, cssSpec } = atomicInfoFromCssStr(atoms, cssStr)
+// {atoms} -> 'breakPt' -> ([{atomicVecs}]) -> [{breakPtAwareAtomicVecs}]
+export const makeResponsiveFn = (atoms, breakPt) => (...atomicVecs) =>
+  flatten(atomicVecs).map(atomicVec => {
+
+    if (!validBreakPtInput(atoms, breakPt, atomicVec)) return ''
+    const { atomicType, cssSpec } = atomicVec
+    const cssStr = getAtomicCssStr(atoms, atomicType, cssSpec)
     const responsiveCssSpec = `${breakPt}:${cssSpec}`
     return atomExists(atoms, atomicType, responsiveCssSpec) ?
-      getAtomicCss(atoms, atomicType, responsiveCssSpec) :
+      getAtomicVec(atoms, atomicType, responsiveCssSpec) :
       addAtomByCssStr(atoms, atomicType, responsiveCssSpec, responsiveCssStr(breakPt, cssStr))
   })
 

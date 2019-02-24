@@ -1,4 +1,4 @@
-import { isObj, isStr, isNumOrNonEmptyStr, isUndef, isNonEmptyStr, getOr } from './typeUtils'
+import { isObj, isStr, isNumOrNonEmptyStr, isUndef, isNonEmptyStr, flatten, isNil, isFn } from './typeUtils'
 import { cssKeysToSpec, fillCssTemplate } from './cssUtils'
 
 // const atoms = {
@@ -21,6 +21,9 @@ import { cssKeysToSpec, fillCssTemplate } from './cssUtils'
 //   }
 // }
 
+// Atomic vector: { atomicType, cssSpec, css }
+//                                       ^ cssStr if mapping not active
+//                                       ^ mappedCss if mapping is active
 
 // is atomic input valid?
 // {atoms} -> 'atomicType' -> 'cssSpec' -> bool
@@ -48,53 +51,65 @@ export const getAtomicCssStr = (atoms, atomicType, cssSpec) =>
 export const getAtomicMappedCss = (atoms, atomicType, cssSpec) =>
   atomExists(atoms, atomicType, cssSpec) ? atoms[atomicType][cssSpec]['mappedCss'] : ''
 
-// if css mapping is active, atoms mappedCss, otherwise returns cssStr
-export const getAtomicCss = (atoms, atomicType, cssSpec) =>
-  atoms._mapCssFn ?
+const mappingActive = atoms => isFn(atoms._mapCssFn)
+const mapCssStr = (atoms, cssStr) => mappingActive(atoms) ? atoms._mapCssFn(cssStr) : ''
+
+export const getAtomicVec = (atoms, atomicType, cssSpec) => ({
+  atomicType,
+  cssSpec,
+  css : mappingActive(atoms) ?
     getAtomicMappedCss(atoms, atomicType, cssSpec) :
     getAtomicCssStr(atoms, atomicType, cssSpec)
+})
 
 // Add an atom if you arlready know the cssString
-// returns cssStr
+// returns atomicVec
 export const addAtomByCssStr = (atoms, atomicType, cssSpec, cssStr) => {
   if (!validAtomicInput(atoms, atomicType, cssSpec) || !isStr(cssStr)) return ''
 
   // add the atom
   if (!atomicTypeExists(atoms, atomicType)) atoms[atomicType] = {}
-  const mappedCss = atoms._mapCssFn ? atoms._mapCssFn(cssStr) : ''
+  // const mappedCss = mappingActive(atoms) ? atoms._mapCssFn(cssStr) : ''
+  // const mappedCss = mappingActive(atoms) ? atoms._mapCssFn(cssStr) : ''
+  const mappedCss = mapCssStr(atoms, cssStr)
   atoms[atomicType][cssSpec] = { cssStr, mappedCss }
 
   // add to the reverse atom
-  if (isUndef(atoms['_reverse'])) atoms['_reverse'] = {}
-  atoms['_reverse'][cssStr] = { atomicType, cssSpec }
+  // if (isUndef(atoms['_reverse'])) atoms['_reverse'] = {}
+  // atoms['_reverse'][cssStr] = { atomicType, cssSpec }
 
-  return atoms._mapCssFn ? mappedCss : cssStr
+  return getAtomicVec(atoms, atomicType, cssSpec)
 }
 
 // Add an atom to the atoms object
 // If the corresponding atom already exists, it is overwritten
 // Returns the cssStr corresponding the the constructed atom
-// {atoms} -> 'atomicType' -> (cssMapFn) 'cssTemplate' -> ['' | num] -> cssStr
+// {atoms} -> 'atomicType' -> (cssMapFn) 'cssTemplate' -> [cssTemplate: '' | num] -> {atomicVec}
 export const addAtomByCssKeys = (atoms, atomicType, cssMapFn, cssTemplate, cssKeys) => {
   const cssSpec = cssKeysToSpec(cssKeys)
   const cssStr = fillCssTemplate(cssKeys, cssTemplate, cssMapFn)
   return addAtomByCssStr(atoms, atomicType, cssSpec, cssStr)
 }
 
-// 'cssStr' -> { atomicType, cssSpec }
-const nullAtomicInfo = { atomicType: undefined, cssSpec: undefined }
-export const atomicInfoFromCssStr = (atoms, cssStr) =>
-  getOr(nullAtomicInfo, ['_reverse', cssStr], atoms)
-
-// create a function which will accept 1 or more cssKeys and return corresponding cssStr
-// {atoms} -> 'atomicType' -> (cssMapFn) 'cssTemplate' -> (atomicFn)
+// create a function which will accept 1 or more cssKeys and return corresponding atomicVector
+// {atoms} -> 'atomicType' -> (cssMapFn) 'cssTemplate' -> (atomicFn) -> {atomicVec}
 export const makeAtomicFn = (atoms, atomicType, cssMapFn, cssTemplate) =>
   (...cssKeys) => {
     const cssSpec = cssKeysToSpec(cssKeys)
     return atomExists(atoms, atomicType, cssSpec) ?
-      getAtomicCss(atoms, atomicType, cssSpec) :
+      getAtomicVec(atoms, atomicType, cssSpec) :
       addAtomByCssKeys(atoms, atomicType, cssMapFn, cssTemplate, cssKeys)
   }
+
+
+// Wrapper for atomic function and atomic modifier calls
+// Receives an list consisting of atomic vectors, nested to any level
+// Returns list of corresponding css (cssStr || mapped Css)
+// [ {av} &| [ {av} ]] => ['cssStr' | *mappedCss*]
+export const at = (...atomicVectors) => {
+  return flatten(atomicVectors).map(v => !isNil(v.css) ? v.css : '')
+}
+
 // Given an atomic map, return object containing corresponding atomic functions
 // {} -> {} -> {}
 export const mapAtomicFns = (atoms, atomicMap) =>

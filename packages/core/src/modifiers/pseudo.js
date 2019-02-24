@@ -1,5 +1,5 @@
 import { flatten, isStr, isUndef, isObj } from '../utils/typeUtils'
-import { atomicInfoFromCssStr, atomExists, getAtomicCss, addAtomByCssStr } from '../utils/atomicUtils'
+import { atomExists, getAtomicCssStr, addAtomByCssStr, getAtomicVec } from '../utils/atomicUtils'
 import { fillCssTemplate } from '../utils/cssUtils'
 
 export const pseudoMap = {
@@ -17,9 +17,9 @@ export const pseudoCssStr = (selector, cssStr) =>
   !isStr(selector) || !isStr(cssStr) || isUndef(pseudoMap.selectors[selector]) ? '' :
   fillCssTemplate([ `${pseudoMap.selectors[selector]}`, cssStr ], pseudoMap.template)
 
-const validSelectorInput = (atoms, selector, cssStr) =>
-  isObj(atoms) && isStr(selector) && isStr(cssStr) &&
-  !isUndef(pseudoMap.selectors[selector]) && !isUndef(atoms._reverse[cssStr])
+const validSelectorInput = (atoms, selector, atomicVec) =>
+  isObj(atoms) && isStr(selector) && isObj(atomicVec) &&
+  !isUndef(pseudoMap.selectors[selector])
 
 // Create a function that will apply styles at one of the selectors in pseudoMap.selectors
 // The function returned recieves a list of the cssStrs (potentially nested) to which
@@ -27,14 +27,14 @@ const validSelectorInput = (atoms, selector, cssStr) =>
 // selector aware cssStrs.  The returned function assumes that the corresponding
 // non-selector atomic entries have already been added.
 // {atoms} -> 'breakPt' -> ([ cssStr &| [cssStrs]]) -> [ 'breakPtAwareCssStrs']
-export const makePseudoFn = (atoms, selector) => (...cssStrs) =>
-  flatten(cssStrs).map(cssStr => {
-    if (!validSelectorInput(atoms, selector, cssStr)) return ''
-
-    const { atomicType, cssSpec } = atomicInfoFromCssStr(atoms, cssStr)
+export const makePseudoFn = (atoms, selector) => (...atomicVecs) =>
+  flatten(atomicVecs).map(atomicVec => {
+    if (!validSelectorInput(atoms, selector, atomicVec)) return ''
+    const { atomicType, cssSpec } = atomicVec
+    const cssStr = getAtomicCssStr(atoms, atomicType, cssSpec)
     const pseudoCssSpec = `${selector}:${cssSpec}`
     return atomExists(atoms, atomicType, pseudoCssSpec) ?
-      getAtomicCss(atoms, atomicType, pseudoCssSpec) :
+      getAtomicVec(atoms, atomicType, pseudoCssSpec) :
       addAtomByCssStr(atoms, atomicType, pseudoCssSpec, pseudoCssStr(selector, cssStr))
   })
 

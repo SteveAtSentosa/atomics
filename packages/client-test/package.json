@@ -24,6 +24,8 @@
     "@emotion/babel-preset-css-prop": "^10.0.6",
     "@emotion/core": "^10.0.6",
     "prop-types": "^15.6.2",
+    "ramda": "^0.26.1",
+    "ramda-adjunct": "^2.16.1",
     "react": "^16.7.0",
     "react-dom": "^16.7.0"
   },
