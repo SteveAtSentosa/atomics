@@ -97,12 +97,14 @@ export default function runThemeTests() {
       expect(themePropToCssKey(theme, 'padding', '@wide')).to.equal(8)
     })
     it('atomic functions should apply themeing', () => {
-      const { c, bgc, p, at, installTheme } = atomics
+      const { c, bgc, p, at, installTheme, rxMd, hover } = atomics
       installTheme(theme)
       expect(at(c('@standOut'))).to.deep.equal(['color: #0097a7;'])
       expect(at(c('@primaryOne'))).to.deep.equal(['color: #512da8;'])
       expect(at(bgc('@primaryOne'))).to.deep.equal(['background-color: #f57c00;'])
       expect(at(p('@narrow'))).to.deep.equal(['padding: 0.5rem;'])
+      expect(at(rxMd(c('@standOut')))).to.deep.equal(['@media (min-width: 768px) { color: #0097a7; };'])
+      expect(at(hover(c('@dark')))).to.deep.equal(['&:hover { color: #757575; };'])
     })
   })
 }
