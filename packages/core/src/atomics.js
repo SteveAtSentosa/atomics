@@ -5,16 +5,13 @@ import { fontSizeAtomicMap, fontWeightAtomicMap, lineHeightAtomicMap } from './m
 import { positionAtomicMap } from './maps/position'
 import { sizeAtomicMap } from './maps/size'
 
-
 import { mapResponsiveFns, rxMap } from './modifiers/responsive'
 import { mapPseudoFns, pseudoMap } from './modifiers/pseudo'
-
 import { mapAtomicFns, at } from './utils/atomicUtils'
 
-
-
 let atoms = {
-  _mapCssFn: null
+  _mapCssFn: null,
+  _theme: null,
 }
 
 const atomicFns = {
@@ -34,14 +31,6 @@ const atomicModifiers = {
   ...mapPseudoFns(atoms, pseudoMap)
 }
 
-const atomicUtils = {
-  setCssMapFn:  fn => { atoms._mapCssFn = fn },
-  clearCssMapFn:  () => { atoms._mapCssFn = null },
-  resetAtoms: () => { atoms = { _mapCssFn: null } },
-  getAtoms: () => atoms // for debugging only
-}
-
-
 // experiement .. if it works, find cleaner way
 const molecules = {
   size: (w, h) => [
@@ -50,12 +39,20 @@ const molecules = {
   ]
 }
 
+const helperFns = {
+  at,
+  molecules,
+  setCssMapFn:  fn => { atoms._mapCssFn = fn },
+  clearCssMapFn:  () => { atoms._mapCssFn = null },
+  resetAtoms: () => { atoms = { _mapCssFn: null } },
+  getAtoms: () => atoms, // for debugging only
+  installTheme: theme => { atoms._theme = theme }
+}
+
 export default {
   ...atomicFns,
   ...atomicModifiers,
-  ...atomicUtils,
-  at,
-  molecules,
+  ...helperFns,
 }
 
 

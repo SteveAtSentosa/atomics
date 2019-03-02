@@ -1,5 +1,6 @@
 import { isObj, isStr, isNumOrNonEmptyStr, isUndef, isNonEmptyStr, flatten, isNil, isFn } from './typeUtils'
 import { cssKeysToSpec, fillCssTemplate } from './cssUtils'
+import { themePropToCssKey } from './themeUtils'
 
 // const atoms = {
 //   pt : { <-- atomicType
@@ -69,14 +70,8 @@ export const addAtomByCssStr = (atoms, atomicType, cssSpec, cssStr) => {
 
   // add the atom
   if (!atomicTypeExists(atoms, atomicType)) atoms[atomicType] = {}
-  // const mappedCss = mappingActive(atoms) ? atoms._mapCssFn(cssStr) : ''
-  // const mappedCss = mappingActive(atoms) ? atoms._mapCssFn(cssStr) : ''
   const mappedCss = mapCssStr(atoms, cssStr)
   atoms[atomicType][cssSpec] = { cssStr, mappedCss }
-
-  // add to the reverse atom
-  // if (isUndef(atoms['_reverse'])) atoms['_reverse'] = {}
-  // atoms['_reverse'][cssStr] = { atomicType, cssSpec }
 
   return getAtomicVec(atoms, atomicType, cssSpec)
 }
@@ -94,13 +89,14 @@ export const addAtomByCssKeys = (atoms, atomicType, cssMapFn, cssTemplate, cssKe
 // create a function which will accept 1 or more cssKeys and return corresponding atomicVector
 // {atoms} -> 'atomicType' -> (cssMapFn) 'cssTemplate' -> (atomicFn) -> {atomicVec}
 export const makeAtomicFn = (atoms, atomicType, cssMapFn, cssTemplate) =>
-  (...cssKeys) => {
+  (...possiblyThemedCssKeys) => {
+    const cssKeys = possiblyThemedCssKeys.map(cssKeyOrThemeProp =>
+      themePropToCssKey(atoms._theme, atomicType, cssKeyOrThemeProp))
     const cssSpec = cssKeysToSpec(cssKeys)
     return atomExists(atoms, atomicType, cssSpec) ?
       getAtomicVec(atoms, atomicType, cssSpec) :
       addAtomByCssKeys(atoms, atomicType, cssMapFn, cssTemplate, cssKeys)
   }
-
 
 // Wrapper for atomic function and atomic modifier calls
 // Receives an list consisting of atomic vectors, nested to any level

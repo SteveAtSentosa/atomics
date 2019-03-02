@@ -24,7 +24,7 @@ export default function runAtomicFnTests() {
 
       expect(at(c('blue-300'))).to.deep.equal(['color: #64b5f6;'])
       expect(at(c())).to.deep.equal([''])
-      expect(at(bgc('@primaryOne'))).to.deep.equal(['background-color: #512da8;'])
+      expect(at(bgc('primaryOne'))).to.deep.equal(['background-color: #512da8;'])
       expect(at(bc('#101010'))).to.deep.equal(['border-color: #101010;'])
 
       expect(at(d('ib'))).to.deep.equal(['display: inline-block;'])

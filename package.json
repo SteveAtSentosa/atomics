@@ -17,6 +17,7 @@
     "clean": "lerna run clean",
     "build": "lerna run build",
     "test":  "lerna run test",
+    "watch:test": "cd packages/core && yarn watch:test",
     "clean:modules": "lerna clean -y; rm -rf ./node_modules",
     "clean:all": "yarn clean; yarn clean:modules",
     "bootstrap": "lerna bootstrap",

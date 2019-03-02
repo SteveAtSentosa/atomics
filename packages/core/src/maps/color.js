@@ -7,10 +7,10 @@ export const colorMap = {
     ...materialDesignColors,
 
     // add custom colors, theming, etc here
-    '@primaryOne': materialDesignColors['deep-purple-700'],
-    '@primaryTwo': materialDesignColors['amber-700'],
-    '@complimentaryOne': materialDesignColors['blue-a200'],
-    '@complimentaryTwo': materialDesignColors['cyan-600'],
+    'primaryOne': materialDesignColors['deep-purple-700'],
+    'primaryTwo': materialDesignColors['amber-700'],
+    'complimentaryOne': materialDesignColors['blue-a200'],
+    'complimentaryTwo': materialDesignColors['cyan-600'],
   }
 }
 

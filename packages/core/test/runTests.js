@@ -5,6 +5,7 @@ import runCssSpecTests from './testCssSpecs'
 import runAtomTests from './testAtoms'
 import runAtomFunctionTests from './testAtomicFn'
 import runAtomicModifierTests from './testAtomicModifiers'
+import runThemeTests from './testThemes'
 
 describe('atomics tests', () => {
   runUtilsTests()
@@ -14,4 +15,5 @@ describe('atomics tests', () => {
   runAtomTests()
   runAtomFunctionTests()
   runAtomicModifierTests()
+  runThemeTests()
 })

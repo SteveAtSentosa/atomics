@@ -35,8 +35,8 @@ export default function runCssMapTests() {
     it('should map colors correctly', () => {
       expect(mapColor('white')).to.equal('#ffffff')
       expect(mapColor('blue-a200')).to.equal('#448aff')
-      expect(mapColor('@primaryOne')).to.equal('#512da8')
-      expect(mapColor('@complimentaryTwo')).to.equal('#00acc1')
+      expect(mapColor('primaryOne')).to.equal('#512da8')
+      expect(mapColor('complimentaryTwo')).to.equal('#00acc1')
       expect(mapColor('#customcolor')).to.equal('#customcolor')
       expect(mapColor({})).to.equal('')
 
