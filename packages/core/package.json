@@ -1,6 +1,6 @@
 {
   "name": "@atomics/core",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "main": "src/index.js",
   "author": "Steven Saunders <steve@sentosatech.com>",
   "description": "Core atomics library",
@@ -12,7 +12,7 @@
     "onchange": "^5.2.0",
     "ramda": "^0.26.1",
     "rimraf": "^2.6.3"
-    },
+  },
   "scripts": {
     "clean": "rimraf es dist lib",
     "build:cjs": "cross-env BABEL_ENV=cjs babel src --out-dir lib",

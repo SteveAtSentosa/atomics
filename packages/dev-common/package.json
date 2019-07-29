@@ -1,6 +1,6 @@
 {
   "name": "@atomics/dev-common",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Config dev stuff common to all atomics packages",
   "files": [
     "babel.config.base.js",
@@ -33,5 +33,3 @@
     "webpack-cli": "^3.2.1"
   }
 }
-
-

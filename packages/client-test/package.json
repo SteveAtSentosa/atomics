@@ -1,6 +1,6 @@
 {
   "name": "@atomics/client-test",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Visual testing for atomics",
   "main": "index.js",
   "author": "Steven Saunders",
