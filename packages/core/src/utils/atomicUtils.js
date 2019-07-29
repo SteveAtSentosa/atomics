@@ -43,12 +43,13 @@ export const atomExists = (atoms, atomicType, cssSpec) =>
   atomicTypeExists(atoms, atomicType) &&
   !isUndef(atoms[atomicType][cssSpec])
 
-// get an atom's cssStr
-// Returns '' if atom does not exist, or on invalid input
-// {atoms} -> 'atomicType' -> 'cssSpec' -> 'cssStr' | any:mappedCss
 export const getAtomicCssStr = (atoms, atomicType, cssSpec) =>
   atomExists(atoms, atomicType, cssSpec) ? atoms[atomicType][cssSpec]['cssStr'] : ''
 
+
+// get an atom's cssStr
+// Returns '' if atom does not exist, or on invalid input
+// {atoms} -> 'atomicType' -> 'cssSpec' -> *mappedCss
 export const getAtomicMappedCss = (atoms, atomicType, cssSpec) =>
   atomExists(atoms, atomicType, cssSpec) ? atoms[atomicType][cssSpec]['mappedCss'] : ''
 
@@ -65,6 +66,7 @@ export const getAtomicVec = (atoms, atomicType, cssSpec) => ({
 
 // Add an atom if you arlready know the cssString
 // returns atomicVec
+// ({atoms}, 'atomicType', 'cssSpec', 'cssStr) -> {atomicVec}
 export const addAtomByCssStr = (atoms, atomicType, cssSpec, cssStr) => {
   if (!validAtomicInput(atoms, atomicType, cssSpec) || !isStr(cssStr)) return ''
 
@@ -90,8 +92,10 @@ export const addAtomByCssKeys = (atoms, atomicType, cssMapFn, cssTemplate, cssKe
 // {atoms} -> 'atomicType' -> (cssMapFn) 'cssTemplate' -> (atomicFn) -> {atomicVec}
 export const makeAtomicFn = (atoms, atomicType, cssMapFn, cssTemplate) =>
   (...possiblyThemedCssKeys) => {
+
     const cssKeys = possiblyThemedCssKeys.map(cssKeyOrThemeProp =>
       themePropToCssKey(atoms._theme, atomicType, cssKeyOrThemeProp))
+
     const cssSpec = cssKeysToSpec(cssKeys)
     return atomExists(atoms, atomicType, cssSpec) ?
       getAtomicVec(atoms, atomicType, cssSpec) :
@@ -99,8 +103,8 @@ export const makeAtomicFn = (atoms, atomicType, cssMapFn, cssTemplate) =>
   }
 
 // Wrapper for atomic function and atomic modifier calls
-// Receives an list consisting of atomic vectors, nested to any level
-// Returns list of corresponding css (cssStr || mapped Css)
+// Receives a list consisting of atomic vectors, nested to any level
+// Returns flattened list of corresponding css (cssStr || mapped Css)
 // [ {av} &| [ {av} ]] => ['cssStr' | *mappedCss*]
 export const at = (...atomicVectors) => {
   return flatten(atomicVectors).map(v => !isNil(v.css) ? v.css : '')

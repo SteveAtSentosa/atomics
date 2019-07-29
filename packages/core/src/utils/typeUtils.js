@@ -11,8 +11,6 @@ export const isNumOrNonEmptyStr = toCheck => isNum(toCheck) || isNonEmptyStr(toC
 
 export const toStr = toConvert => isStr(toConvert) ? toConvert : String(toConvert)
 export const arrayify = input => (isArr(input) ? input : [input])
-export const flatten = arr =>
-  arr.reduce((acc, val) =>  Array.isArray(val) ? acc.concat(flatten(val)) : acc.concat(val), [])
 
 export const noop = () => undefined
 export const reflect = v => v
@@ -33,7 +31,6 @@ export const getOr = (fallback, path, obj) => {
   return isNil(val) ? fallback : val
 }
 
-
 //export const isNonEmptyArr = toCheck => isArr(toCheck) && toCheck.length > 0
 //export const isArrOrStr = toCheck => isArr(toCheck) || isStr(toCheck)
 //export const isArrOrObj = toCheck => isArr(toCheck) || isObj(toCheck)
@@ -45,7 +42,21 @@ export const getOr = (fallback, path, obj) => {
 //   toCheck.reduce((noNonStr, entry) => noNonStr && isStr(entry), true)
 
 // export const isStrOrArrayOfStr = toCheck => isStr(toCheck) || isArrOfStr(toCheck)
-// export const flatArrify = input => flatten(arrayify(input))
+
+
+// adapted from https://github.com/jonschlinkert/arr-flatten/blob/master/index.js
+export const flatten = arr => flat(arr, [])
+const flat = (arr, res) => {
+  let i = 0; let cur; let len = arr.length
+  for (; i < len; i++) {
+    cur = arr[i]
+    Array.isArray(cur) ? flat(cur, res) : res.push(cur)
+  }
+  return res
+}
+
+
+export const flatArrify = input => flatten(arrayify(input))
 
 // remove array duplicates (experimental, only works on arrays of built in types )
 // export const unique = toPrune =>

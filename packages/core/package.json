@@ -1,10 +1,11 @@
 {
   "name": "@atomics/core",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "main": "src/index.js",
   "author": "Steven Saunders <steve@sentosatech.com>",
   "description": "Core atomics library",
   "license": "MIT",
+  "private": false,
   "devDependencies": {
     "chai": "^4.2.0",
     "cross-env": "^5.2.0",
